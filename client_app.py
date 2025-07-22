@@ -1,4 +1,7 @@
+<<<<<<< HEAD
+=======
 # client_app.py (ta wersja nie wymaga zmian w SERVER_URL na razie)
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
 import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime, timedelta
@@ -8,9 +11,22 @@ import requests
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 # --- KONFIGURACJA SERWERA ---
+<<<<<<< HEAD
+# !!! WAŻNE: ZMIEŃ TO NA TWÓJ WŁAŚCIWY URL Z RENDER.COM !!!
+# NA CZAS TESTÓW LOKALNYCH USTAWIJ "http://127.0.0.1:5000"
+SERVER_URL = "https://boss-tracker-api.onrender.com"
+
+# Co ile milisekund odpytywać SERWER o nowe dane (np. 3 sekundy)
+UPDATE_SERVER_INTERVAL_MS = 3000
+
+# Co ile milisekund odświeżać LOKALNE GUI (np. 1 sekundę)
+# GUI odświeża się płynnie, nawet jeśli serwer odpytywany jest rzadziej
+UPDATE_UI_INTERVAL_MS = 1000
+=======
 # WAŻNE: Zostaw to tak na razie. Zmienimy to po wdrożeniu na Render.com!
 SERVER_URL = "http://127.0.0.1:5000" 
 
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
 
 # Konfiguracja bossów (taka sama jak w serwerze, aby uniknąć błędów)
 BOSS_CONFIG = {
@@ -19,7 +35,11 @@ BOSS_CONFIG = {
     "Serpentor #1": 41, "Serpentor #2": 41
 }
 CHANNELS = ["CH1", "CH2", "CH3", "CH4", "CH5", "CH6"]
+<<<<<<< HEAD
+BOSS_STATE_FILE = "boss_state.json" # Plik do lokalnego cachowania stanu bossów
+=======
 STATE_FILE = "boss_state.json" # Ten plik nie będzie używany do synchronizacji, ale może zostać do backupu
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
 
 # --- Paleta kolorów dla Dark Mode ---
 colors = {
@@ -37,10 +57,53 @@ colors = {
     "reset_button_fg": "#f0f0f0"
 }
 
+<<<<<<< HEAD
+# --- FUNKCJE POMOCNICZE (do ładowania/zapisywania lokalnego stanu) ---
+def load_local_boss_state():
+    """Ładuje ostatni znany stan bossów z lokalnego pliku JSON."""
+    try:
+        if os.path.exists(BOSS_STATE_FILE):
+            with open(BOSS_STATE_FILE, 'r') as f:
+                return json.load(f)
+        else:
+            return {}
+    except (json.JSONDecodeError, Exception) as e:
+        print(f"Błąd ładowania lokalnego stanu ({BOSS_STATE_FILE}): {e}")
+        return {}
+
+def save_local_boss_state(state):
+    """Zapisuje bieżący stan bossów do lokalnego pliku JSON."""
+    try:
+        with open(BOSS_STATE_FILE, 'w') as f:
+            json.dump(state, f, indent=4)
+    except IOError as e:
+        print(f"Błąd zapisu lokalnego stanu do {BOSS_STATE_FILE}: {e}")
+
+# --- KLASA APLIKACJI TKINTER ---
+=======
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
 class BossTrackerApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Wężowe Pole - Tracker Bossów (Wersja Sieciowa)")
+<<<<<<< HEAD
+        self.geometry("820x520")
+        self.resizable(False, False)
+        self.configure(bg=colors['bg'])
+
+        self.reset_button_images = {}
+
+        self.state = load_local_boss_state()
+        self.labels = {}
+
+        self.create_ui()
+
+        self.connection_status_label = tk.Label(self, text="Status: Łączenie z serwerem...", font=("Segoe UI", 9), bg=colors['bg'], fg="blue")
+        self.connection_status_label.grid(row=len(CHANNELS) + 2, column=0, columnspan=len(BOSS_CONFIG) * 2 + 1, pady=5, sticky="w", padx=10)
+
+        self.fetch_data_from_server()
+        self.update_statuses_ui()
+=======
         self.geometry("820x520") 
         self.resizable(False, False)
         self.configure(bg=colors['bg'])
@@ -52,6 +115,7 @@ class BossTrackerApp(tk.Tk):
         
         self.create_ui()
         self.update_statuses()
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
 
     def create_vertical_text_image(self, text, font_size=10, font_name="Segoe UI Bold", text_color=colors['reset_button_fg'], bg_color=colors['reset_button_bg']):
         try:
@@ -68,7 +132,11 @@ class BossTrackerApp(tk.Tk):
         img = Image.new('RGBA', (text_width + 4, text_height + 4), color=bg_color)
         draw = ImageDraw.Draw(img)
         draw.text((2, 2), text, font=font, fill=text_color)
+<<<<<<< HEAD
+
+=======
         
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
         rotated_img = img.transpose(Image.Transpose.ROTATE_90)
 
         final_img = Image.new('RGBA', (rotated_img.width, rotated_img.height), color=bg_color)
@@ -77,7 +145,11 @@ class BossTrackerApp(tk.Tk):
         return ImageTk.PhotoImage(final_img)
 
     def create_ui(self):
+<<<<<<< HEAD
+        num_boss_columns_in_frame = len(BOSS_CONFIG) * 2 - 1
+=======
         num_boss_columns_in_frame = len(BOSS_CONFIG) * 2 - 1 
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
         if len(BOSS_CONFIG) == 0:
             num_boss_columns_in_frame = 0
 
@@ -95,11 +167,37 @@ class BossTrackerApp(tk.Tk):
             if c_idx > 0:
                 tk.Frame(main_header_frame, width=2, bg=colors['separator']).grid(row=0, column=current_header_column_index, sticky="ns")
                 current_header_column_index += 1
+<<<<<<< HEAD
+
+=======
             
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
             header_label = tk.Label(main_header_frame, text=boss_name, font=("Segoe UI", 9, "bold"), anchor="center", bg=colors['frame_bg'], fg=colors['fg'])
             header_label.grid(row=0, column=current_header_column_index, pady=2, sticky="ew")
             main_header_frame.grid_columnconfigure(current_header_column_index, weight=1)
             current_header_column_index += 1
+<<<<<<< HEAD
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(num_boss_columns_in_frame + 1, weight=0)
+
+        for r_idx, ch in enumerate(CHANNELS):
+            frame = tk.LabelFrame(self, text=ch, padx=5, pady=5, font=("Segoe UI", 9, "bold"), labelanchor="nw", bg=colors['frame_bg'], fg=colors['fg'], bd=1)
+            frame.grid(row=r_idx + 2, column=0, padx=(10, 2), pady=2, sticky="ew")
+
+            reset_text = "RESET"
+            self.reset_button_images[ch] = self.create_vertical_text_image(reset_text)
+
+            reset_btn = tk.Button(self,
+                                  image=self.reset_button_images[ch],
+                                  compound="center",
+                                  command=lambda ch_name=ch: self.reset_channel(ch_name),
+                                  bg=colors['reset_button_bg'],
+                                  fg=colors['reset_button_fg'],
+                                  relief=tk.FLAT, borderwidth=0)
+            reset_btn.grid(row=r_idx + 2, column=num_boss_columns_in_frame + 1, padx=(2, 10), sticky="ns", pady=2)
+
+=======
         
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(num_boss_columns_in_frame + 1, weight=0) 
@@ -120,6 +218,7 @@ class BossTrackerApp(tk.Tk):
                                   relief=tk.FLAT, borderwidth=0)
             reset_btn.grid(row=r_idx + 2, column=num_boss_columns_in_frame + 1, padx=(2, 10), sticky="ns", pady=2) 
             
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
             current_channel_column_index = 0
             for c_idx, boss_name in enumerate(BOSS_CONFIG.keys()):
                 if c_idx > 0:
@@ -127,6 +226,96 @@ class BossTrackerApp(tk.Tk):
                     current_channel_column_index += 1
 
                 key = f"{ch}_{boss_name}"
+<<<<<<< HEAD
+
+                boss_elements_frame = tk.Frame(frame, bg=colors['frame_bg'], bd=1, relief="solid")
+                boss_elements_frame.grid(row=0, column=current_channel_column_index, padx=2, pady=2, sticky="ew")
+
+                boss_elements_frame.grid_columnconfigure(0, weight=1)
+                boss_elements_frame.grid_columnconfigure(1, weight=1)
+
+                btn = tk.Button(boss_elements_frame, text="Zbij", command=lambda k=key: self.toggle_kill(k), bg=colors['button'], fg=colors['button_fg'], relief=tk.FLAT, borderwidth=0)
+                btn.grid(row=0, column=0, sticky="ew", padx=(0,1))
+
+                label = tk.Label(boss_elements_frame, text="...", width=10, fg='white')
+                label.grid(row=0, column=1, sticky="ew", padx=(1,0))
+
+                self.labels[key] = label
+                current_channel_column_index += 1
+
+            for i in range(len(BOSS_CONFIG)):
+                frame.grid_columnconfigure(i * 2, weight=1)
+
+    def fetch_data_from_server(self):
+        """Pobiera najnowsze dane o bossach z serwera i aktualizuje self.state."""
+        try:
+            response = requests.get(f"{SERVER_URL}/get_state", timeout=5)
+            response.raise_for_status()
+            new_state = response.json()
+
+            if new_state != self.state:
+                self.state = new_state
+                save_local_boss_state(self.state)
+                self.connection_status_label.config(text="Status: Połączono (dane zaktualizowane)", fg="green")
+            else:
+                self.connection_status_label.config(text="Status: Połączono (brak nowych danych)", fg="gray")
+
+        except requests.exceptions.Timeout:
+            self.connection_status_label.config(text="Status: Limit czasu połączenia. Serwer może się budzić...", fg="orange")
+        except requests.exceptions.ConnectionError:
+            self.connection_status_label.config(text="Status: Błąd połączenia (serwer offline?). Próbuję ponownie...", fg="red")
+        except requests.exceptions.RequestException as e:
+            self.connection_status_label.config(text=f"Status: Błąd serwera ({e}). Próbuję ponownie...", fg="red")
+        except json.JSONDecodeError:
+            self.connection_status_label.config(text="Status: Błąd danych z serwera (JSON). Próbuję ponownie...", fg="red")
+        except Exception as e:
+            self.connection_status_label.config(text=f"Status: Nieoczekiwany błąd ({type(e).__name__}: {e}).", fg="red")
+        finally:
+            self.after(UPDATE_SERVER_INTERVAL_MS, self.fetch_data_from_server)
+
+    def _load_state_from_server_immediate(self):
+        try:
+            response = requests.get(f"{SERVER_URL}/get_state", timeout=5)
+            response.raise_for_status()
+            new_state = response.json()
+            if new_state != self.state:
+                self.state = new_state
+                save_local_boss_state(self.state)
+                self.connection_status_label.config(text="Status: Dane zaktualizowane natychmiast!", fg="darkgreen")
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Błąd natychmiastowego pobierania stanu z serwera: {e}")
+            self.connection_status_label.config(text="Status: Błąd natychmiastowej aktualizacji z serwera!", fg="red")
+            return False
+
+    def toggle_kill(self, key):
+        # Sprawdź, czy boss jest już "zbity" w lokalnym stanie
+        if self.state.get(key):
+            # Jeśli jest, to usuń go ze stanu (wysyłając timestamp=None)
+            timestamp_to_send = None
+        else:
+            # Jeśli nie jest, oznacz go jako "zbitego" teraz
+            timestamp_to_send = datetime.now().isoformat()
+
+        payload = {
+            "key": key,
+            "timestamp": timestamp_to_send # <--- Tutaj jest zmiana!
+        }
+
+        try:
+            response = requests.post(f"{SERVER_URL}/update_boss_status", json=payload, timeout=5)
+            response.raise_for_status()
+
+            self._load_state_from_server_immediate()
+            self.update_statuses_ui()
+            # Usunięto messagebox.showinfo("Sukces", ...)
+        except requests.exceptions.Timeout:
+            messagebox.showerror("Błąd", f"Nie udało się zaktualizować statusu bossa {key}: Przekroczono limit czasu serwera.")
+        except requests.exceptions.RequestException as e:
+            messagebox.showerror("Błąd aktualizacji", f"Nie udało się zaktualizować statusu bossa na serwerze: {e}")
+        except Exception as e:
+            messagebox.showerror("Błąd", f"Nieoczekiwany błąd podczas aktualizacji statusu: {e}")
+=======
                 
                 boss_elements_frame = tk.Frame(frame, bg=colors['frame_bg'], bd=1, relief="solid")
                 boss_elements_frame.grid(row=0, column=current_channel_column_index, padx=2, pady=2, sticky="ew")
@@ -171,10 +360,66 @@ class BossTrackerApp(tk.Tk):
             self.update_statuses()
         except requests.exceptions.RequestException as e:
             messagebox.showerror("Błąd aktualizacji", f"Nie udało się zaktualizować statusu bossa na serwerze: {e}")
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
 
     def reset_channel(self, channel):
         if messagebox.askyesno("Potwierdzenie", f"Na pewno zresetować wszystkie dane dla kanału {channel}?"):
             try:
+<<<<<<< HEAD
+                response = requests.post(f"{SERVER_URL}/reset_channel/{channel}", timeout=5)
+                response.raise_for_status()
+
+                self._load_state_from_server_immediate()
+                self.update_statuses_ui()
+
+                messagebox.showinfo("Sukces", f"Kanał {channel} został zresetowany na serwerze.")
+            except requests.exceptions.Timeout:
+                messagebox.showerror("Błąd", f"Nie udało się zresetować kanału {channel}: Przekroczono limit czasu serwera.")
+            except requests.exceptions.RequestException as e:
+                messagebox.showerror("Błąd resetowania", f"Nie udało się zresetować kanału na serwerze: {e}")
+            except Exception as e:
+                messagebox.showerror("Błąd", f"Nieoczekiwany błąd podczas resetowania kanału: {e}")
+
+    def update_statuses_ui(self):
+        """Aktualizuje statusy bossów w interfejsie użytkownika na podstawie self.state (lokalnego)."""
+        now = datetime.now()
+        for ch in CHANNELS:
+            for boss_name, minutes in BOSS_CONFIG.items():
+                key = f"{ch}_{boss_name}"
+                last_kill_timestamp = self.state.get(key)
+
+                label = self.labels.get(key)
+
+                if not label:
+                    print(f"Ostrzeżenie: Etykieta dla klucza '{key}' nie została znaleziona w UI.")
+                    continue
+
+                if last_kill_timestamp:
+                    try:
+                        killed_at = datetime.fromisoformat(last_kill_timestamp)
+                        respawn_time = killed_at + timedelta(minutes=minutes)
+                        remaining = (respawn_time - now).total_seconds()
+
+                        if remaining <= 0:
+                            label.config(text="🟢 Aktywny", bg=colors['active'], fg='white')
+                        elif remaining > 300:
+                            mins = int(remaining // 60)
+                            label.config(text=f"🔴 {mins} min", bg=colors['respawn_later'], fg='white')
+                        else:
+                            mins = int(remaining // 60)
+                            secs = int(remaining % 60)
+                            label.config(text=f"🔴 {mins}:{secs:02}", bg=colors['respawn_soon'], fg='white')
+                    except ValueError:
+                        label.config(text="Błąd czasu", bg=colors['unknown'], fg='red')
+                else:
+                    label.config(text="❓ Nieznany", bg=colors['unknown'], fg='white')
+
+        self.after(UPDATE_UI_INTERVAL_MS, self.update_statuses_ui)
+
+if __name__ == "__main__":
+    app = BossTrackerApp()
+    app.mainloop()
+=======
                 response = requests.post(f"{SERVER_URL}/reset_channel/{channel}")
                 response.raise_for_status()
                 self.state = self.load_state()
@@ -214,3 +459,4 @@ class BossTrackerApp(tk.Tk):
 if __name__ == "__main__":
     app = BossTrackerApp()
     app.mainloop()
+>>>>>>> 84abb818001c8034a37cee4c4448ad816826fe85
